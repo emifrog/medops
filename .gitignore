@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# serwist (generated service worker)
+public/sw*
+public/swe-worker*
+
+# ANSM data files (downloaded by import script)
+scripts/.ansm-data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

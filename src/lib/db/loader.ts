@@ -1,6 +1,6 @@
 import { db } from "./index";
 import type { Table } from "dexie";
-import { supabase } from "@/lib/supabase/client";
+import { getSupabase } from "@/lib/supabase/client";
 import type { Medication, Substance, Presentation, Alert } from "@/types/medication";
 import type { Interaction } from "@/types/interaction";
 import type { Surdosage } from "@/types/surdosage";
@@ -20,6 +20,9 @@ async function getLocalVersion(): Promise<string | null> {
 }
 
 async function getRemoteVersion(): Promise<string | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
   const { data, error } = await supabase
     .from("data_version")
     .select("version")
@@ -36,6 +39,9 @@ async function fetchAndStore<T>(
   mapRow: (row: Record<string, unknown>) => T,
   onProgress: (loaded: number, total: number) => void,
 ): Promise<number> {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error("Supabase non disponible");
+
   const { count } = await supabase
     .from(tableName)
     .select("*", { count: "exact", head: true });

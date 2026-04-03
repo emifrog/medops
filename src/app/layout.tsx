@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
+import { AppShellLoader } from "@/components/layout/AppShellLoader";
 import "./globals.css";
 
 const ibmPlex = IBM_Plex_Sans({
@@ -9,9 +10,9 @@ const ibmPlex = IBM_Plex_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "MedOps — Identification Medicamenteuse",
+  title: "MedOps — Identification Médicamenteuse",
   description:
-    "Aide a l'identification medicamenteuse pour les Sapeurs-Pompiers",
+    "Aide à l'identification médicamenteuse pour les Sapeurs-Pompiers",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -35,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${ibmPlex.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-950 text-white font-[var(--font-ibm-plex)]">
-        {children}
+        <AppShellLoader>{children}</AppShellLoader>
       </body>
     </html>
   );

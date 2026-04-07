@@ -94,39 +94,75 @@ MedOps permet aux sapeurs-pompiers en intervention SAP/VSAV d'identifier rapidem
 
 ---
 
-### 🔷 Phase 4 — Mode terrain & UX avancée (Semaines 11-13)
+### 🔷 Phase 4 — Indications, alertes visuelles, données embarquées (Semaines 10-12)
+
+**Objectif** : Rendre l'app immédiatement utile et autonome dès l'installation.
+
+- [ ] **Indications en langage simple**
+  - Rédiger une phrase d'indication pour les 200 DCI les plus courantes
+  - Format : "Ce médicament traite : [indication]"
+  - Affichée en première section de la fiche, avant la composition
+  - Fallback : classe thérapeutique si pas d'indication rédigée
+
+- [ ] **Alertes visuelles par gravité dans les résultats**
+  - Badge rouge/orange directement dans la liste de résultats (`MedListItem`)
+  - Le SP voit le niveau de danger **avant** d'ouvrir la fiche
+  - Croisement résultats de recherche × table `surdosage` via la DCI
+  - Icône ⚠️ "Surdosage potentiellement létal" / "Risque élevé"
+
+- [ ] **Données embarquées dans le build (offline dès l'installation)**
+  - Export JSON compressé des spécialités + compositions + CIP13
+  - Embarqué dans `public/data/` et precaché par Serwist
+  - L'app est utilisable **immédiatement sans connexion** au premier lancement
+  - Sync Supabase reste active pour les mises à jour
+
+---
+
+### 🔷 Phase 5 — Mode intervention (Semaines 13-15)
+
+**Objectif** : Workflow guidé pour structurer le recueil médicamenteux en intervention.
+
+- [ ] **Page "Nouvelle intervention"** (`/intervention`)
+  - Chronomètre automatique démarré à l'ouverture
+  - Workflow : Identifier → Vérifier interactions → Transmettre bilan
+  - Liste des médicaments trouvés avec badge gravité + indication
+  - Vérificateur d'interactions intégré (alimenté automatiquement)
+
+- [ ] **Bilan d'intervention structuré**
+  - Génération automatique : liste médicaments + interactions + alertes surdosage
+  - Format structuré pour transmission CRRA 15
+  - Bouton "Copier" + bouton "Partager" (Web Share API)
+
+- [ ] **Horodatage et traçabilité**
+  - Chaque action horodatée (scan, recherche, ajout/retrait)
+  - Historique des interventions consultable depuis les réglages
+  - Export texte/PDF pour rapport d'intervention
+  - Géolocalisation optionnelle
+
+---
+
+### 🔷 Phase 6 — Mode terrain & UX avancée (Semaines 16-18)
 
 **Objectif** : Optimisation pour les conditions réelles d'intervention.
 
 - [ ] **Mode nuit / haute visibilité**
   - Thème sombre profond (défaut) pour intervention nocturne
   - Mode haute visibilité (contrastes renforcés, tailles augmentées)
-  - Détection automatique luminosité ambiante
-  - Respect WCAG AAA pour tous les textes critiques (surdosage, alertes)
+  - Respect WCAG AAA pour tous les textes critiques
 
 - [ ] **Mode gants**
-  - Cibles tactiles minimum 48x48px (recommandation : 56x56px)
+  - Cibles tactiles minimum 56x56px
   - Espacement renforcé entre éléments interactifs
-  - Gestes simplifiés (pas de double-tap, pas de pinch-to-zoom critique)
-  - Navigation par swipe gauche/droite entre sections de la fiche
-  - Activation/désactivation depuis les paramètres
-
-- [ ] **Performance offline**
-  - Pré-chargement intégral de la base au premier lancement
-  - Indicateur de progression du téléchargement initial
-  - Synchronisation différentielle (delta updates mensuel)
-  - Taille optimisée de la base (~15-20 Mo compressée)
-  - Fonctionnement 100% sans réseau après premier chargement
+  - Gestes simplifiés (pas de double-tap, pas de pinch)
 
 - [ ] **Installation PWA**
   - Prompt d'installation natif (banner personnalisé)
   - Splash screen aux couleurs MedOps
   - Icône adaptative Android / iOS
-  - Raccourci écran d'accueil
 
 ---
 
-### 🔷 Phase 5 — Qualité & Déploiement (Semaines 14-16)
+### 🔷 Phase 7 — Qualité & Déploiement (Semaines 19-20)
 
 **Objectif** : Fiabilité, tests et mise en production.
 

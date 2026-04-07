@@ -129,6 +129,7 @@ const mapInteraction = (r: Record<string, unknown>): Interaction => ({
 
 const mapSurdosage = (r: Record<string, unknown>): Surdosage => ({
   dci: r.dci as string,
+  indication: (r.indication as string) ?? "",
   doseToxique: (r.dose_toxique as string) ?? "",
   symptomes: (r.symptomes as string[]) ?? [],
   cat: (r.cat as string[]) ?? [],

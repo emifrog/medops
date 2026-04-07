@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { useFavorites } from "@/hooks/useFavorites";
 import { db } from "@/lib/db";
 import { MedListItem } from "@/components/medication/MedListItem";
+import { useSurdosageMap } from "@/hooks/useSurdosageMap";
 import type { Medication } from "@/types/medication";
 
 export default function FavoritesPage() {
   const router = useRouter();
   const { favoriteIds, toggleFavorite, isFavorite } = useFavorites();
+  const { map: surdosageMap } = useSurdosageMap();
   const [favMeds, setFavMeds] = useState<Medication[]>([]);
 
   useEffect(() => {
@@ -49,15 +51,20 @@ export default function FavoritesPage() {
             {favMeds.length} favori{favMeds.length > 1 ? "s" : ""}
           </p>
           <div className="space-y-1.5" role="list" aria-label="Médicaments favoris">
-            {favMeds.map((m) => (
-              <MedListItem
-                key={m.codeCIS}
-                medication={m}
-                onClick={() => router.push(`/med/${m.codeCIS}`)}
-                isFavorite={isFavorite(m.codeCIS)}
-                onToggleFavorite={() => toggleFavorite(m.codeCIS)}
-              />
-            ))}
+            {favMeds.map((m) => {
+              const info = surdosageMap.get(m.dci?.toUpperCase() ?? "");
+              return (
+                <MedListItem
+                  key={m.codeCIS}
+                  medication={m}
+                  onClick={() => router.push(`/med/${m.codeCIS}`)}
+                  isFavorite={isFavorite(m.codeCIS)}
+                  onToggleFavorite={() => toggleFavorite(m.codeCIS)}
+                  gravite={info?.gravite}
+                  indication={info?.indication}
+                />
+              );
+            })}
           </div>
         </>
       )}

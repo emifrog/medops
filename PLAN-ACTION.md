@@ -1,17 +1,18 @@
 # MedOps — Plan d'action complet
 
-> **Version :** 3.0 · **Date :** 03 avril 2026
+> **Version :** 4.0 · **Date :** 07 avril 2026
 > **Stack :** Next.js 16 + Supabase + PWA Offline-First (Serwist)
-> **Scope :** MVP (Phases 1 a 4)
+> **Scope :** MVP (Phases 1-4) + Évolutions (Phases 5-6)
 >
 > | Phase | Statut | Date |
 > |---|---|---|
 > | Phase 1 — Fondations | ✅ TERMINEE | 29/03/2026 |
 > | Phase 2 — Recherche & Consultation | ✅ TERMINEE | 29/03/2026 |
-> | Phase 3 — Scanner CIP13 | ✅ TERMINEE | 29/03/2026 |
-> | Phase 4 — Donnees enrichies | ✅ TERMINEE | 03/04/2026 |
+> | Phase 3 — Scanner CIP13 + Photo OCR + Données enrichies | ✅ TERMINEE | 03/04/2026 |
+> | Phase 4 — Indications, alertes visuelles, données embarquées | ⬜ À FAIRE | — |
+> | Phase 5 — Mode intervention | ⬜ À FAIRE | — |
 >
-> **Base Supabase :** 15 816 specialites · 20 881 CIP13 · 32 395 compositions · 8 479 alertes · 15 814 DCI · 30 fiches CAT/surdosage · 31 interactions
+> **Base Supabase :** 15 816 spécialités · 20 881 CIP13 · 32 395 compositions · 8 479 alertes · 15 814 DCI · 30 fiches CAT/surdosage · 31 interactions
 
 ---
 
@@ -609,6 +610,101 @@ medops/
 
 ---
 
+## Phase 4 — Indications, alertes visuelles, données embarquées (Semaines 10-12)
+
+> Rendre l'app immédiatement utile et autonome dès l'installation.
+
+### 5.1 Indications en langage simple
+
+- [ ] Rédiger une phrase d'indication pour les **200 DCI les plus courantes** en intervention SP :
+  - Format : "Ce médicament traite : [indication en langage simple]"
+  - Exemples :
+    - PARACÉTAMOL → "Douleurs légères à modérées, fièvre"
+    - BISOPROLOL → "Hypertension artérielle, insuffisance cardiaque"
+    - ALPRAZOLAM → "Anxiété sévère, crises d'angoisse"
+- [ ] Ajouter un champ `indication` dans la table `surdosage` (ou nouvelle table `indications`)
+- [ ] Afficher en première section de la fiche médicament, avant la composition
+- [ ] Fallback si pas d'indication rédigée : afficher la classe thérapeutique
+
+### 5.2 Alertes visuelles par gravité dans les résultats de recherche
+
+- [ ] Quand un médicament a une fiche CAT avec `gravite = "vitale"` ou `"elevee"` :
+  - Afficher un **badge rouge/orange** directement dans `MedListItem` (liste de résultats)
+  - Icône ⚠️ avec tooltip "Surdosage potentiellement létal" / "Surdosage à risque élevé"
+- [ ] Le SP voit immédiatement le niveau de danger **avant** d'ouvrir la fiche
+- [ ] Nécessite de croiser les résultats de recherche avec la table `surdosage` via la DCI
+- [ ] Créer un hook `useSurdosageByDCI()` qui charge les fiches CAT en mémoire au démarrage
+
+### 5.3 Pré-chargement des données dans le build (offline dès l'installation)
+
+- [ ] Script `scripts/export-static.ts` :
+  - Exporte les spécialités + compositions + présentations depuis Supabase en JSON compressé
+  - Génère `public/data/medications.json.gz` (~3-5 Mo compressé)
+  - Inclus dans le build Next.js (precaché par Serwist)
+- [ ] Modifier `loader.ts` pour charger depuis le JSON embarqué en fallback :
+  1. Vérifier si IndexedDB est peuplé → utiliser directement
+  2. Sinon, vérifier le réseau → charger depuis Supabase
+  3. Sinon, charger depuis `public/data/medications.json.gz` (embarqué)
+- [ ] Le SP peut installer la PWA et l'utiliser **immédiatement sans connexion**
+- [ ] La sync Supabase reste active pour les mises à jour quand le réseau est disponible
+
+---
+
+## Phase 5 — Mode intervention (Semaines 13-15)
+
+> Workflow guidé pour structurer le recueil d'informations médicamenteuses en intervention.
+
+### 6.1 Page "Nouvelle intervention" (`/intervention`)
+
+- [ ] Bouton visible "Démarrer une intervention" depuis l'accueil ou la bottom nav
+- [ ] Chronomètre automatique démarré à l'ouverture
+- [ ] Workflow en étapes :
+  1. **Identifier** : scanner ou rechercher les médicaments un par un
+  2. **Vérifier** : le vérificateur d'interactions s'alimente automatiquement
+  3. **Transmettre** : générer le bilan complet pour le CRRA 15
+- [ ] Liste des médicaments trouvés avec :
+  - Badge de gravité (rouge/orange/vert)
+  - Indication en une ligne
+  - Bouton "Voir la fiche" pour chaque médicament
+  - Bouton "Retirer" si erreur
+
+### 6.2 Bilan d'intervention structuré
+
+- [ ] Génération automatique du bilan complet :
+  ```
+  ═══ BILAN MÉDICAMENTEUX ═══
+  Date : 07/04/2026 — 14h32
+  Durée : 8 min
+
+  MÉDICAMENTS TROUVÉS (4) :
+  1. DOLIPRANE 1000mg (Paracétamol) — Antalgique
+  2. KARDEGIC 75mg (Aspirine) — Antiagrégant
+  3. ELIQUIS 5mg (Apixaban) — Anticoagulant AOD
+  4. BISOPROLOL 5mg (Bisoprolol) — Bêtabloquant
+
+  ⛔ INTERACTIONS CRITIQUES :
+  • Aspirine + Apixaban — Risque hémorragique majeur
+    CAT : Signaler immédiatement au CRRA 15
+
+  ⚠️ ALERTES SURDOSAGE :
+  • Apixaban (gravité VITALE) — Pas d'antidote largement disponible
+  • Bisoprolol (gravité VITALE) — Antidote : Glucagon IV
+
+  ═══ Généré par MedOps ═══
+  ```
+- [ ] Bouton "Copier le bilan" → presse-papiers
+- [ ] Bouton "Partager" (Web Share API si disponible)
+- [ ] Historique des interventions consultable depuis les réglages
+
+### 6.3 Horodatage et traçabilité
+
+- [ ] Chaque action est horodatée : scan, recherche, ajout/retrait médicament
+- [ ] Stockage dans IndexedDB (table `interventions`)
+- [ ] Export possible en texte/PDF pour le rapport d'intervention
+- [ ] Géolocalisation optionnelle (si permission accordée)
+
+---
+
 ## Risques et mitigations
 
 | # | Risque | Impact | Mitigation |
@@ -622,19 +718,19 @@ medops/
 
 ---
 
-## Jalons MVP
+## Jalons
 
-| Jalon | Semaine | Livrable | Critère de succès |
-|---|---|---|---|
-| **M1** | S2 | Socle Next.js + Supabase + PWA installable + base ANSM importée | PWA installable, Supabase peuplé, IndexedDB chargé |
-| **M2** | S4 | Recherche fuzzy + fiches médicament + navigation complète | "doliprane" → fiche en < 3s offline |
-| **M3** | S6 | Scanner CIP13 (caméra + manuel) → fiche | Scan boîte → fiche en < 2s |
-| **M4** | S9 | 100 fiches CAT + interactions parsées + vérificateur | CAT paracétamol, BZD, BB, AOD complètes |
+| Jalon | Semaine | Livrable | Critère de succès | Statut |
+|---|---|---|---|---|
+| **M1** | S2 | Socle Next.js + Supabase + PWA + base ANSM importée | PWA installable, Supabase peuplé, IndexedDB chargé | ✅ |
+| **M2** | S4 | Recherche fuzzy + fiches médicament + navigation | "doliprane" → fiche en < 3s offline | ✅ |
+| **M3** | S6 | Scanner CIP13 + Photo OCR → fiche | Scan boîte → fiche en < 2s | ✅ |
+| **M4** | S9 | 30 fiches CAT + 31 interactions + vérificateur | CAT paracétamol, BZD, BB, AOD complètes | ✅ |
+| **M5** | S12 | Indications simples + alertes visuelles + données embarquées | App utilisable offline dès l'installation, badge gravité visible dans les résultats | ⬜ |
+| **M6** | S15 | Mode intervention complet | Workflow guidé scan → vérification → bilan CRRA 15 avec chrono et horodatage | ⬜ |
 
 ---
 
 ## Prochaine étape
 
-Le plan est validé. Je peux démarrer l'implémentation de la **Phase 1.1 — Initialisation du projet Next.js 15 + Supabase + Serwist**.
-
-Faut-il que je commence ?
+Démarrer la **Phase 5** : indications en langage simple, alertes visuelles par gravité dans les résultats, et données embarquées pour fonctionner offline dès l'installation.

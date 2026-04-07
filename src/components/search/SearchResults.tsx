@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { MedListItem } from "@/components/medication/MedListItem";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useSurdosageMap } from "@/hooks/useSurdosageMap";
 import type { SearchResult } from "@/lib/search/engine";
 
 interface SearchResultsProps {
@@ -13,6 +14,7 @@ interface SearchResultsProps {
 export function SearchResults({ results, query }: SearchResultsProps) {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { map: surdosageMap } = useSurdosageMap();
 
   if (query.length < 2) {
     return (
@@ -46,21 +48,26 @@ export function SearchResults({ results, query }: SearchResultsProps) {
         {results.length} résultat{results.length !== 1 && "s"}
       </p>
       <div className="space-y-1.5">
-        {results.map((r) => (
-          <MedListItem
-            key={r.codeCIS}
-            medication={{
-              codeCIS: r.codeCIS,
-              name: r.name,
-              dci: r.dci,
-              dosage: r.dosage,
-              forme: r.forme,
-            }}
-            onClick={() => router.push(`/med/${r.codeCIS}`)}
-            isFavorite={isFavorite(r.codeCIS)}
-            onToggleFavorite={() => toggleFavorite(r.codeCIS)}
-          />
-        ))}
+        {results.map((r) => {
+          const info = surdosageMap.get(r.dci?.toUpperCase() ?? "");
+          return (
+            <MedListItem
+              key={r.codeCIS}
+              medication={{
+                codeCIS: r.codeCIS,
+                name: r.name,
+                dci: r.dci,
+                dosage: r.dosage,
+                forme: r.forme,
+              }}
+              onClick={() => router.push(`/med/${r.codeCIS}`)}
+              isFavorite={isFavorite(r.codeCIS)}
+              onToggleFavorite={() => toggleFavorite(r.codeCIS)}
+              gravite={info?.gravite}
+              indication={info?.indication}
+            />
+          );
+        })}
       </div>
     </div>
   );

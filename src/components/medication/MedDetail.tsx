@@ -123,6 +123,15 @@ export function MedDetail({
         )}
       </div>
 
+      {/* Indication */}
+      {med.surdosage?.indication && (
+        <InfoSection
+          icon="💊"
+          title="Indication"
+          content={med.surdosage.indication}
+        />
+      )}
+
       {/* Substances actives */}
       {med.substances.length > 0 && (
         <InfoSection

@@ -3,6 +3,7 @@
 import { ChevronRightIcon, StarIcon } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
 import { Badge } from "@/components/ui/Badge";
+import type { Gravite } from "@/types/surdosage";
 
 interface MedListItemProps {
   medication: {
@@ -15,14 +16,26 @@ interface MedListItemProps {
   onClick: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  gravite?: Gravite | null;
+  indication?: string;
 }
+
+const GRAVITE_BADGE: Record<string, { label: string; color: string }> = {
+  vitale: { label: "⚠️ Létal", color: "#EF4444" },
+  elevee: { label: "⚠️ Élevé", color: "#F97316" },
+  moderee: { label: "Modéré", color: "#F59E0B" },
+};
 
 export function MedListItem({
   medication,
   onClick,
   isFavorite,
   onToggleFavorite,
+  gravite,
+  indication,
 }: MedListItemProps) {
+  const badge = gravite ? GRAVITE_BADGE[gravite] : undefined;
+
   return (
     <button
       onClick={onClick}
@@ -40,10 +53,19 @@ export function MedListItem({
                 {medication.dosage}
               </Badge>
             )}
+            {badge && (
+              <Badge color={badge.color} small>
+                {badge.label}
+              </Badge>
+            )}
           </div>
           <p className="text-slate-500 text-xs mt-0.5 truncate">
-            {medication.dci}
-            {medication.forme ? ` · ${medication.forme}` : ""}
+            {indication || (
+              <>
+                {medication.dci}
+                {medication.forme ? ` · ${medication.forme}` : ""}
+              </>
+            )}
           </p>
         </div>
         {onToggleFavorite && (

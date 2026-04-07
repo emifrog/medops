@@ -11,6 +11,7 @@ import { SearchResults } from "@/components/search/SearchResults";
 import { MedListItem } from "@/components/medication/MedListItem";
 import { CATEGORIES, type Category } from "@/lib/utils/categories";
 import { CategoryGrid } from "@/components/search/CategoryGrid";
+import { useSurdosageMap } from "@/hooks/useSurdosageMap";
 
 export default function HomePage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function HomePage() {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { meds: categoryMeds, loading: categoryLoading } =
     useCategoryMeds(activeCategory);
+  const { map: surdosageMap } = useSurdosageMap();
 
   const isSearching = query.length >= 2;
   const isBrowsingCategory = activeCategory !== null;
@@ -74,15 +76,20 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="space-y-1.5">
-              {categoryMeds.map((m) => (
-                <MedListItem
-                  key={m.codeCIS}
-                  medication={m}
-                  onClick={() => router.push(`/med/${m.codeCIS}`)}
-                  isFavorite={isFavorite(m.codeCIS)}
-                  onToggleFavorite={() => toggleFavorite(m.codeCIS)}
-                />
-              ))}
+              {categoryMeds.map((m) => {
+                const info = surdosageMap.get(m.dci?.toUpperCase() ?? "");
+                return (
+                  <MedListItem
+                    key={m.codeCIS}
+                    medication={m}
+                    onClick={() => router.push(`/med/${m.codeCIS}`)}
+                    isFavorite={isFavorite(m.codeCIS)}
+                    onToggleFavorite={() => toggleFavorite(m.codeCIS)}
+                    gravite={info?.gravite}
+                    indication={info?.indication}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

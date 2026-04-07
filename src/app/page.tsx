@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useSearch } from "@/hooks/useSearch";
 import { useHistory } from "@/hooks/useHistory";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -13,6 +14,9 @@ import { CATEGORIES, type Category } from "@/lib/utils/categories";
 import { CategoryGrid } from "@/components/search/CategoryGrid";
 import { useSurdosageMap } from "@/hooks/useSurdosageMap";
 import { MedListItemSkeleton } from "@/components/ui/Skeleton";
+
+const ITEM_HEIGHT = 62; // hauteur estimée MedListItem en px
+const ITEM_GAP = 6; // space-y-1.5 = 6px
 
 export default function HomePage() {
   const router = useRouter();
@@ -27,6 +31,23 @@ export default function HomePage() {
 
   const isSearching = query.length >= 2;
   const isBrowsingCategory = activeCategory !== null;
+
+  // Offset du container de liste pour le virtualizer fenêtre
+  const listRef = useRef<HTMLDivElement>(null);
+  const [listOffset, setListOffset] = useState(0);
+
+  useLayoutEffect(() => {
+    if (listRef.current && isBrowsingCategory && !categoryLoading) {
+      setListOffset(listRef.current.offsetTop);
+    }
+  }, [isBrowsingCategory, categoryLoading]);
+
+  const virtualizer = useWindowVirtualizer({
+    count: categoryMeds.length,
+    estimateSize: () => ITEM_HEIGHT + ITEM_GAP,
+    scrollMargin: listOffset,
+    overscan: 5,
+  });
 
   const handleClearAll = () => {
     setQuery("");
@@ -54,17 +75,24 @@ export default function HomePage() {
         <div className="space-y-2 animate-[fadeIn_0.25s_ease-out]">
           <div className="flex items-center justify-between px-1">
             <p className="text-xs text-slate-500">
-              {categoryMeds.length} resultat
-              {categoryMeds.length !== 1 && "s"} dans{" "}
-              <span className="text-amber-500">{activeCategory.label}</span>
+              {categoryLoading ? (
+                <span className="animate-pulse">Chargement…</span>
+              ) : (
+                <>
+                  {categoryMeds.length} résultat
+                  {categoryMeds.length !== 1 && "s"} dans{" "}
+                  <span className="text-amber-500">{activeCategory.label}</span>
+                </>
+              )}
             </p>
             <button
               onClick={() => setActiveCategory(null)}
               className="text-xs text-amber-500 hover:text-amber-400 transition-colors duration-150"
             >
-              Tout voir
+              Retour
             </button>
           </div>
+
           {categoryLoading ? (
             <div className="space-y-1.5">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -78,20 +106,40 @@ export default function HomePage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-1.5">
-              {categoryMeds.map((m, i) => {
+            // Liste virtualisée — seuls les items visibles sont dans le DOM
+            <div
+              ref={listRef}
+              style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+            >
+              {virtualizer.getVirtualItems().map((virtualItem) => {
+                const m = categoryMeds[virtualItem.index];
+                if (!m) return null;
                 const info = surdosageMap.get(m.dci?.toUpperCase() ?? "");
                 return (
-                  <MedListItem
-                    key={m.codeCIS}
-                    index={i}
-                    medication={m}
-                    onClick={() => router.push(`/med/${m.codeCIS}`)}
-                    isFavorite={isFavorite(m.codeCIS)}
-                    onToggleFavorite={() => toggleFavorite(m.codeCIS)}
-                    gravite={info?.gravite}
-                    indication={info?.indication}
-                  />
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      transform: `translateY(${
+                        virtualItem.start - virtualizer.options.scrollMargin
+                      }px)`,
+                      paddingBottom: ITEM_GAP,
+                    }}
+                  >
+                    <MedListItem
+                      medication={m}
+                      onClick={() => router.push(`/med/${m.codeCIS}`)}
+                      isFavorite={isFavorite(m.codeCIS)}
+                      onToggleFavorite={() => toggleFavorite(m.codeCIS)}
+                      gravite={info?.gravite}
+                      indication={info?.indication}
+                    />
+                  </div>
                 );
               })}
             </div>

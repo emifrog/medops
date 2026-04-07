@@ -14,16 +14,21 @@ export function CategoryGrid({ categories, onSelect }: CategoryGridProps) {
 
   useEffect(() => {
     async function loadCounts() {
-      const allMeds = await db.medications.toArray();
       const map = new Map<string, number>();
-
-      for (const cat of categories) {
-        const count = allMeds.filter((m) =>
-          cat.atcPrefixes.some((prefix) => m.codeATC.startsWith(prefix)),
-        ).length;
-        map.set(cat.id, count);
-      }
-
+      // Requêtes indexées par préfixe ATC — pas de full scan
+      await Promise.all(
+        categories.map(async (cat) => {
+          const prefixCounts = await Promise.all(
+            cat.atcPrefixes.map((prefix) =>
+              db.medications.where("codeATC").startsWith(prefix).count(),
+            ),
+          );
+          map.set(
+            cat.id,
+            prefixCounts.reduce((sum, n) => sum + n, 0),
+          );
+        }),
+      );
       setCounts(map);
     }
 

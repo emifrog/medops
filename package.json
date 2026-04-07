@@ -13,6 +13,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.100.1",
+    "@tanstack/react-virtual": "^3.13.23",
     "dexie": "^4.4.1",
     "html5-qrcode": "^2.3.8",
     "minisearch": "^7.2.0",

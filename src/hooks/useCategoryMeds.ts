@@ -18,12 +18,13 @@ export function useCategoryMeds(category: Category | null) {
     setLoading(true);
 
     async function load() {
-      // Chercher les médicaments dont le code ATC commence par un des préfixes
-      const allMeds = await db.medications.toArray();
-      const filtered = allMeds.filter((m) =>
-        category!.atcPrefixes.some((prefix) => m.codeATC.startsWith(prefix)),
+      // Requêtes indexées par préfixe ATC — évite le full scan des 15k médicaments
+      const results = await Promise.all(
+        category!.atcPrefixes.map((prefix) =>
+          db.medications.where("codeATC").startsWith(prefix).toArray(),
+        ),
       );
-      // Trier par nom
+      const filtered = results.flat();
       filtered.sort((a, b) => a.name.localeCompare(b.name, "fr"));
       setMeds(filtered);
       setLoading(false);
@@ -39,24 +40,7 @@ export function useCategoryCounts() {
   const [counts, setCounts] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
-    async function load() {
-      const allMeds = await db.medications.toArray();
-      const map = new Map<string, number>();
-
-      for (const med of allMeds) {
-        if (!med.codeATC) continue;
-        // Compter par préfixe ATC
-        const prefix2 = med.codeATC.slice(0, 1);
-        const prefix3 = med.codeATC.slice(0, 3);
-        // On stocke les deux niveaux
-        map.set(prefix2, (map.get(prefix2) ?? 0) + 1);
-        map.set(prefix3, (map.get(prefix3) ?? 0) + 1);
-      }
-
-      setCounts(map);
-    }
-
-    load();
+    // Placeholder — useCategoryCounts n'est plus utilisé (counts dans CategoryGrid)
   }, []);
 
   return counts;

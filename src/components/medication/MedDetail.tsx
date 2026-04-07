@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import {
   ChevronLeftIcon,
   StarIcon,
   ClipboardDocumentIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
 import { Badge } from "@/components/ui/Badge";
@@ -27,6 +29,7 @@ export function MedDetail({
   onToggleFavorite,
 }: MedDetailProps) {
   const { toast } = useToast();
+  const [alertsExpanded, setAlertsExpanded] = useState(med.alerts.length <= 3);
   const category = getCategoryForATC(med.codeATC);
 
   const handleCopy = async () => {
@@ -170,38 +173,54 @@ export function MedDetail({
       {/* Alertes ANSM */}
       {med.alerts.length > 0 && (
         <section aria-label="Alertes ANSM" className="space-y-2">
-          <div className="flex items-center gap-2 px-1">
-            <span className="text-base" aria-hidden="true">⚠️</span>
-            <h3 className="font-bold text-xs uppercase tracking-widest text-amber-400">
-              {med.alerts.length} alerte{med.alerts.length > 1 ? "s" : ""} ANSM
-            </h3>
-          </div>
-          {med.alerts.map((alert, i) => (
-            <div
-              key={alert.id ?? i}
-              className="p-3 bg-amber-950/30 border-2 border-amber-500/20 rounded-xl"
-            >
-              <p className="text-sm text-slate-200 leading-relaxed">
-                {alert.texte}
-              </p>
-              {alert.dateDebut && (
-                <p className="text-[10px] text-slate-500 mt-1">
-                  Depuis le {alert.dateDebut}
-                  {alert.dateFin ? ` — jusqu'au ${alert.dateFin}` : ""}
-                </p>
-              )}
-              {alert.lien && (
-                <a
-                  href={alert.lien}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[10px] text-amber-500 hover:text-amber-400 mt-1 block transition-colors duration-150"
-                >
-                  En savoir plus →
-                </a>
-              )}
+          <button
+            onClick={() => setAlertsExpanded((v) => !v)}
+            aria-expanded={alertsExpanded}
+            className="w-full flex items-center justify-between px-1 group focus-visible:outline-2 focus-visible:outline-amber-500 rounded"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-base" aria-hidden="true">⚠️</span>
+              <h3 className="font-bold text-xs uppercase tracking-widest text-amber-400">
+                {med.alerts.length} alerte{med.alerts.length > 1 ? "s" : ""} ANSM
+              </h3>
             </div>
-          ))}
+            <ChevronDownIcon
+              className={`w-4 h-4 text-amber-400/60 transition-transform duration-200 ${
+                alertsExpanded ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {alertsExpanded && (
+            <div className="space-y-2 animate-[fadeIn_0.2s_ease-out]">
+              {med.alerts.map((alert, i) => (
+                <div
+                  key={alert.id ?? i}
+                  className="p-3 bg-amber-950/30 border-2 border-amber-500/20 rounded-xl"
+                >
+                  <p className="text-sm text-slate-200 leading-relaxed">
+                    {alert.texte}
+                  </p>
+                  {alert.dateDebut && (
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      Depuis le {alert.dateDebut}
+                      {alert.dateFin ? ` — jusqu'au ${alert.dateFin}` : ""}
+                    </p>
+                  )}
+                  {alert.lien && (
+                    <a
+                      href={alert.lien}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-amber-500 hover:text-amber-400 mt-1 block transition-colors duration-150"
+                    >
+                      En savoir plus →
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 

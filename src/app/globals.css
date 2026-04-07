@@ -55,6 +55,34 @@ body {
   }
 }
 
+/* Animation slideUp (toast + modal mobile) */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation staggerIn pour les éléments de liste */
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-item {
+  animation: staggerIn 0.2s ease-out both;
+}
+
 /* Cacher le viewfinder par défaut de html5-qrcode */
 #medops-scanner video {
   object-fit: cover !important;

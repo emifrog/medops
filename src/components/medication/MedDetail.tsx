@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import {
   ChevronLeftIcon,
   StarIcon,
   ClipboardDocumentIcon,
-  CheckIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
 import { Badge } from "@/components/ui/Badge";
 import { InfoSection } from "@/components/ui/InfoSection";
+import { useToast } from "@/components/ui/Toast";
 import { formatBilanSAMU, copyToClipboard } from "@/lib/utils/formatters";
 import { getCategoryForATC } from "@/lib/utils/categories";
 import type { MedicationFull } from "@/types/medication";
@@ -27,15 +26,16 @@ export function MedDetail({
   isFavorite,
   onToggleFavorite,
 }: MedDetailProps) {
-  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
   const category = getCategoryForATC(med.codeATC);
 
   const handleCopy = async () => {
     const text = formatBilanSAMU(med);
     const ok = await copyToClipboard(text);
     if (ok) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      toast("Bilan copié dans le presse-papiers");
+    } else {
+      toast("Échec de la copie", "error");
     }
   };
 
@@ -85,12 +85,8 @@ export function MedDetail({
           aria-label="Copier le bilan SAMU"
           className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 bg-slate-800/50 border-slate-700/40 text-slate-400 hover:text-slate-200 text-sm font-semibold transition-all duration-150 active:scale-95 focus-visible:outline-2 focus-visible:outline-amber-500"
         >
-          {copied ? (
-            <CheckIcon className="w-4 h-4 text-green-400" />
-          ) : (
-            <ClipboardDocumentIcon className="w-4 h-4" />
-          )}
-          <span>{copied ? "Copié !" : "Bilan"}</span>
+          <ClipboardDocumentIcon className="w-4 h-4" />
+          <span>Bilan</span>
         </button>
       </div>
 

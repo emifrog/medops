@@ -12,6 +12,7 @@ import { MedListItem } from "@/components/medication/MedListItem";
 import { CATEGORIES, type Category } from "@/lib/utils/categories";
 import { CategoryGrid } from "@/components/search/CategoryGrid";
 import { useSurdosageMap } from "@/hooks/useSurdosageMap";
+import { MedListItemSkeleton } from "@/components/ui/Skeleton";
 
 export default function HomePage() {
   const router = useRouter();
@@ -65,9 +66,11 @@ export default function HomePage() {
             </button>
           </div>
           {categoryLoading ? (
-            <p className="text-center text-slate-500 py-8 animate-pulse">
-              Chargement...
-            </p>
+            <div className="space-y-1.5">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <MedListItemSkeleton key={i} />
+              ))}
+            </div>
           ) : categoryMeds.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-slate-500 text-sm">
@@ -76,11 +79,12 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="space-y-1.5">
-              {categoryMeds.map((m) => {
+              {categoryMeds.map((m, i) => {
                 const info = surdosageMap.get(m.dci?.toUpperCase() ?? "");
                 return (
                   <MedListItem
                     key={m.codeCIS}
+                    index={i}
                     medication={m}
                     onClick={() => router.push(`/med/${m.codeCIS}`)}
                     isFavorite={isFavorite(m.codeCIS)}

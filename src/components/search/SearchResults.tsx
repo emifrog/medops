@@ -48,11 +48,12 @@ export function SearchResults({ results, query }: SearchResultsProps) {
         {results.length} résultat{results.length !== 1 && "s"}
       </p>
       <div className="space-y-1.5">
-        {results.map((r) => {
+        {results.map((r, i) => {
           const info = surdosageMap.get(r.dci?.toUpperCase() ?? "");
           return (
             <MedListItem
               key={r.codeCIS}
+              index={i}
               medication={{
                 codeCIS: r.codeCIS,
                 name: r.name,

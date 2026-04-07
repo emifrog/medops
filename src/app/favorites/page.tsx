@@ -51,11 +51,12 @@ export default function FavoritesPage() {
             {favMeds.length} favori{favMeds.length > 1 ? "s" : ""}
           </p>
           <div className="space-y-1.5" role="list" aria-label="Médicaments favoris">
-            {favMeds.map((m) => {
+            {favMeds.map((m, i) => {
               const info = surdosageMap.get(m.dci?.toUpperCase() ?? "");
               return (
                 <MedListItem
                   key={m.codeCIS}
+                  index={i}
                   medication={m}
                   onClick={() => router.push(`/med/${m.codeCIS}`)}
                   isFavorite={isFavorite(m.codeCIS)}

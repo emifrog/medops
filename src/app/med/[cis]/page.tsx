@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMedication } from "@/hooks/useMedication";
 import { useFavorites } from "@/hooks/useFavorites";
 import { MedDetail } from "@/components/medication/MedDetail";
+import { MedDetailSkeleton } from "@/components/ui/Skeleton";
 
 export default function MedicationPage({
   params,
@@ -17,11 +18,7 @@ export default function MedicationPage({
   const { isFavorite, toggleFavorite } = useFavorites();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <p className="text-slate-500 animate-pulse">Chargement...</p>
-      </div>
-    );
+    return <MedDetailSkeleton />;
   }
 
   if (!medication) {

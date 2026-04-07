@@ -18,6 +18,7 @@ interface MedListItemProps {
   onToggleFavorite?: () => void;
   gravite?: Gravite | null;
   indication?: string;
+  index?: number;
 }
 
 const GRAVITE_BADGE: Record<string, { label: string; color: string }> = {
@@ -33,6 +34,7 @@ export function MedListItem({
   onToggleFavorite,
   gravite,
   indication,
+  index = 0,
 }: MedListItemProps) {
   const badge = gravite ? GRAVITE_BADGE[gravite] : undefined;
 
@@ -40,7 +42,8 @@ export function MedListItem({
     <button
       onClick={onClick}
       role="listitem"
-      className="w-full text-left p-3.5 md:p-4 bg-slate-800/40 hover:bg-slate-800/80 border-2 border-slate-700/30 hover:border-amber-500/30 rounded-xl transition-all duration-150 active:scale-[0.98] group focus-visible:outline-2 focus-visible:outline-amber-500 min-h-14"
+      className="stagger-item w-full text-left p-3.5 md:p-4 bg-slate-800/40 hover:bg-slate-800/80 border-2 border-slate-700/30 hover:border-amber-500/30 rounded-xl transition-all duration-150 active:scale-[0.98] group focus-visible:outline-2 focus-visible:outline-amber-500 min-h-14"
+      style={{ animationDelay: `${index * 30}ms` }}
     >
       <div className="flex items-center gap-3">
         <div className="flex-1 min-w-0">

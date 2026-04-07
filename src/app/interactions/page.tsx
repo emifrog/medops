@@ -4,24 +4,21 @@ import { useState, useCallback } from "react";
 import { useInteractions } from "@/hooks/useInteractions";
 import { useSearch } from "@/hooks/useSearch";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useToast } from "@/components/ui/Toast";
+import { Modal } from "@/components/ui/Modal";
 import { MedListItem } from "@/components/medication/MedListItem";
 import { SearchBar } from "@/components/search/SearchBar";
 import { INTERACTION_LEVELS } from "@/types/interaction";
 import { copyToClipboard } from "@/lib/utils/formatters";
 import type { Medication } from "@/types/medication";
-import {
-  PlusIcon,
-  XMarkIcon,
-  ClipboardDocumentIcon,
-  CheckIcon,
-} from "@heroicons/react/24/outline";
+import { PlusIcon, XMarkIcon, ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 
 export default function InteractionsPage() {
   const [selectedMeds, setSelectedMeds] = useState<Medication[]>([]);
   const [showPicker, setShowPicker] = useState(false);
   const [pickerQuery, setPickerQuery] = useState("");
-  const [copied, setCopied] = useState(false);
   const { isFavorite } = useFavorites();
+  const { toast } = useToast();
 
   const pickerResults = useSearch(pickerQuery);
   const { detected, totalInteractionsInDB } = useInteractions(selectedMeds);
@@ -43,6 +40,11 @@ export default function InteractionsPage() {
   const removeMed = (codeCIS: string) => {
     setSelectedMeds((prev) => prev.filter((m) => m.codeCIS !== codeCIS));
   };
+
+  const closePicker = useCallback(() => {
+    setShowPicker(false);
+    setPickerQuery("");
+  }, []);
 
   const handleCopyBilan = async () => {
     if (detected.length === 0) return;
@@ -70,8 +72,9 @@ export default function InteractionsPage() {
     }
     const ok = await copyToClipboard(lines.join("\n"));
     if (ok) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      toast("Bilan interactions copié");
+    } else {
+      toast("Échec de la copie", "error");
     }
   };
 
@@ -105,6 +108,7 @@ export default function InteractionsPage() {
             <span className="text-[10px] text-slate-500">{m.dci}</span>
             <button
               onClick={() => removeMed(m.codeCIS)}
+              aria-label={`Retirer ${m.name}`}
               className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
             >
               <XMarkIcon className="w-4 h-4" />
@@ -114,7 +118,7 @@ export default function InteractionsPage() {
         {selectedMeds.length < 10 && (
           <button
             onClick={() => setShowPicker(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 border-2 border-dashed border-slate-700 hover:border-amber-500/40 rounded-xl text-slate-500 hover:text-amber-400 transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 border-2 border-dashed border-slate-700 hover:border-amber-500/40 rounded-xl text-slate-500 hover:text-amber-400 transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-amber-500"
           >
             <PlusIcon className="w-5 h-5" />
             <span className="text-sm font-semibold">Ajouter</span>
@@ -134,14 +138,10 @@ export default function InteractionsPage() {
             {detected.length > 0 && (
               <button
                 onClick={handleCopyBilan}
-                className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-amber-400 transition-colors"
+                className="flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-amber-400 transition-colors focus-visible:outline-2 focus-visible:outline-amber-500 rounded px-1"
               >
-                {copied ? (
-                  <CheckIcon className="w-3 h-3 text-green-400" />
-                ) : (
-                  <ClipboardDocumentIcon className="w-3 h-3" />
-                )}
-                {copied ? "Copie !" : "Copier le bilan"}
+                <ClipboardDocumentIcon className="w-3.5 h-3.5" />
+                Copier le bilan
               </button>
             )}
           </div>
@@ -160,7 +160,7 @@ export default function InteractionsPage() {
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <div
-                      className="w-2 h-2 rounded-full"
+                      className="w-2 h-2 rounded-full shrink-0"
                       style={{ backgroundColor: lvl.color }}
                     />
                     <span
@@ -203,7 +203,7 @@ export default function InteractionsPage() {
       {/* État initial */}
       {selectedMeds.length < 2 && (
         <div className="text-center py-10 text-slate-600">
-          <p className="text-3xl mb-2">⚡</p>
+          <p className="text-3xl mb-2" aria-hidden="true">⚡</p>
           <p className="text-sm">
             Ajoutez au moins 2 médicaments pour vérifier les interactions
           </p>
@@ -211,84 +211,68 @@ export default function InteractionsPage() {
       )}
 
       {/* Picker modal */}
-      {showPicker && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end md:items-center md:justify-center animate-[fadeIn_0.15s_ease-out]">
-          <div className="w-full md:max-w-2xl max-h-[80vh] md:max-h-[85vh] bg-slate-900 border-t-2 md:border-2 border-slate-700 rounded-t-2xl md:rounded-2xl overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between p-4 pb-2">
-              <p className="text-sm md:text-base font-bold text-slate-300">
-                Sélectionner un médicament
-              </p>
-              <button
-                onClick={() => {
-                  setShowPicker(false);
-                  setPickerQuery("");
-                }}
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-800 text-slate-400 hover:text-white transition-colors duration-150"
-              >
-                <XMarkIcon className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="px-4 pb-2">
-              <SearchBar
-                query={pickerQuery}
-                onQueryChange={setPickerQuery}
-                showClear={pickerQuery.length > 0}
-              />
-            </div>
-            <div className="overflow-auto p-4 pt-2 space-y-1.5">
-              {pickerQuery.length >= 2 ? (
-                pickerResults.length > 0 ? (
-                  pickerResults
-                    .filter(
-                      (r) =>
-                        !selectedMeds.find(
-                          (m) => m.codeCIS === r.codeCIS,
-                        ),
-                    )
-                    .map((r) => (
-                      <MedListItem
-                        key={r.codeCIS}
-                        medication={{
-                          codeCIS: r.codeCIS,
-                          name: r.name,
-                          dci: r.dci,
-                          dosage: r.dosage,
-                          forme: r.forme,
-                        }}
-                        onClick={() =>
-                          addMed({
-                            codeCIS: r.codeCIS,
-                            name: r.name,
-                            dci: r.dci,
-                            dosage: r.dosage,
-                            forme: r.forme,
-                            voie: "",
-                            labo: r.labo,
-                            statutAMM: "",
-                            classe: r.classe,
-                            codeATC: r.codeATC,
-                            searchText: "",
-                            conservation: "",
-                            updatedAt: "",
-                          })
-                        }
-                        isFavorite={isFavorite(r.codeCIS)}
-                      />
-                    ))
-                ) : (
-                  <p className="text-center text-slate-600 py-8 text-sm">
-                    Aucun resultat
-                  </p>
-                )
-              ) : (
-                <p className="text-center text-slate-600 py-8 text-sm">
-                  Tapez le nom du medicament...
-                </p>
-              )}
-            </div>
-          </div>
+      <Modal
+        open={showPicker}
+        onClose={closePicker}
+        title="Sélectionner un médicament"
+      >
+        <div className="px-4 pb-3 pt-2">
+          <SearchBar
+            query={pickerQuery}
+            onQueryChange={setPickerQuery}
+            showClear={pickerQuery.length > 0}
+            onClear={() => setPickerQuery("")}
+          />
         </div>
-      )}
+        <div className="overflow-auto px-4 pb-4 space-y-1.5">
+          {pickerQuery.length >= 2 ? (
+            pickerResults.length > 0 ? (
+              pickerResults
+                .filter(
+                  (r) => !selectedMeds.find((m) => m.codeCIS === r.codeCIS),
+                )
+                .map((r) => (
+                  <MedListItem
+                    key={r.codeCIS}
+                    medication={{
+                      codeCIS: r.codeCIS,
+                      name: r.name,
+                      dci: r.dci,
+                      dosage: r.dosage,
+                      forme: r.forme,
+                    }}
+                    onClick={() =>
+                      addMed({
+                        codeCIS: r.codeCIS,
+                        name: r.name,
+                        dci: r.dci,
+                        dosage: r.dosage,
+                        forme: r.forme,
+                        voie: "",
+                        labo: r.labo,
+                        statutAMM: "",
+                        classe: r.classe,
+                        codeATC: r.codeATC,
+                        searchText: "",
+                        conservation: "",
+                        updatedAt: "",
+                      })
+                    }
+                    isFavorite={isFavorite(r.codeCIS)}
+                  />
+                ))
+            ) : (
+              <p className="text-center text-slate-600 py-8 text-sm">
+                Aucun résultat
+              </p>
+            )
+          ) : (
+            <p className="text-center text-slate-600 py-8 text-sm">
+              Tapez le nom du médicament…
+            </p>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

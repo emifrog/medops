@@ -79,10 +79,10 @@ export default function InteractionsPage() {
     <div className="space-y-4 animate-[fadeIn_0.25s_ease-out]">
       <div>
         <h2 className="text-lg font-black text-white">
-          Verificateur d&apos;interactions
+          Vérificateur d&apos;interactions
         </h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          Ajoutez les medicaments trouves chez la victime
+          Ajoutez les médicaments trouvés chez la victime
           {totalInteractionsInDB > 0 && (
             <span className="text-slate-700">
               {" "}
@@ -128,7 +128,7 @@ export default function InteractionsPage() {
           <div className="flex items-center justify-between px-0.5">
             <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold">
               {detected.length} interaction
-              {detected.length !== 1 && "s"} detectee
+              {detected.length !== 1 && "s"} détectée
               {detected.length !== 1 && "s"}
             </p>
             {detected.length > 0 && (
@@ -190,10 +190,10 @@ export default function InteractionsPage() {
           ) : (
             <div className="p-4 bg-green-500/10 border-2 border-green-500/30 rounded-xl text-center">
               <p className="text-green-400 font-semibold text-sm">
-                Aucune interaction connue detectee
+                Aucune interaction connue détectée
               </p>
               <p className="text-green-400/60 text-xs mt-1">
-                Verifiez toujours aupres du CRRA 15
+                Vérifiez toujours auprès du CRRA 15
               </p>
             </div>
           )}
@@ -205,25 +205,25 @@ export default function InteractionsPage() {
         <div className="text-center py-10 text-slate-600">
           <p className="text-3xl mb-2">⚡</p>
           <p className="text-sm">
-            Ajoutez au moins 2 medicaments pour verifier les interactions
+            Ajoutez au moins 2 médicaments pour vérifier les interactions
           </p>
         </div>
       )}
 
       {/* Picker modal */}
       {showPicker && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end animate-[fadeIn_0.15s_ease-out]">
-          <div className="w-full max-h-[75vh] bg-slate-900 border-t-2 border-slate-700 rounded-t-2xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end md:items-center md:justify-center animate-[fadeIn_0.15s_ease-out]">
+          <div className="w-full md:max-w-2xl max-h-[80vh] md:max-h-[85vh] bg-slate-900 border-t-2 md:border-2 border-slate-700 rounded-t-2xl md:rounded-2xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-4 pb-2">
-              <p className="text-sm font-bold text-slate-300">
-                Selectionner un medicament
+              <p className="text-sm md:text-base font-bold text-slate-300">
+                Sélectionner un médicament
               </p>
               <button
                 onClick={() => {
                   setShowPicker(false);
                   setPickerQuery("");
                 }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-800 text-slate-400"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-800 text-slate-400 hover:text-white transition-colors duration-150"
               >
                 <XMarkIcon className="w-4 h-4" />
               </button>

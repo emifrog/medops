@@ -106,7 +106,7 @@ export function CameraScanner({ onScan, active }: CameraScannerProps) {
 
   if (status === "error") {
     return (
-      <div className="relative bg-black rounded-2xl overflow-hidden aspect-3/4 max-h-[55vh] flex items-center justify-center border-2 border-slate-800">
+      <div className="relative bg-black rounded-2xl overflow-hidden aspect-3/4 md:aspect-video max-h-[55vh] md:max-h-[60vh] flex items-center justify-center border-2 border-slate-800">
         <div className="absolute inset-0 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 opacity-80" />
         <div className="text-center z-10 p-8" role="alert">
           <p className="text-4xl mb-4" aria-hidden="true">📷</p>
@@ -125,7 +125,7 @@ export function CameraScanner({ onScan, active }: CameraScannerProps) {
   }
 
   return (
-    <div className="relative bg-black rounded-2xl overflow-hidden aspect-3/4 max-h-[55vh] border-2 border-slate-800">
+    <div className="relative bg-black rounded-2xl overflow-hidden aspect-3/4 md:aspect-video max-h-[55vh] md:max-h-[60vh] border-2 border-slate-800">
       <div id="medops-scanner" ref={containerRef} className="w-full h-full" />
 
       {status === "scanning" && (

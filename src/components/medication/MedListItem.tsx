@@ -40,12 +40,12 @@ export function MedListItem({
     <button
       onClick={onClick}
       role="listitem"
-      className="w-full text-left p-3.5 bg-slate-800/40 hover:bg-slate-800/80 border-2 border-slate-700/30 hover:border-amber-500/30 rounded-xl transition-all duration-150 active:scale-[0.98] group focus-visible:outline-2 focus-visible:outline-amber-500"
+      className="w-full text-left p-3.5 md:p-4 bg-slate-800/40 hover:bg-slate-800/80 border-2 border-slate-700/30 hover:border-amber-500/30 rounded-xl transition-all duration-150 active:scale-[0.98] group focus-visible:outline-2 focus-visible:outline-amber-500 min-h-14"
     >
       <div className="flex items-center gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="font-bold text-white group-hover:text-amber-400 transition-colors duration-150">
+            <span className="font-bold text-white text-sm md:text-base group-hover:text-amber-400 transition-colors duration-150">
               {medication.name}
             </span>
             {medication.dosage && (
@@ -59,7 +59,7 @@ export function MedListItem({
               </Badge>
             )}
           </div>
-          <p className="text-slate-500 text-xs mt-0.5 truncate">
+          <p className="text-slate-500 text-xs md:text-sm mt-0.5 truncate">
             {indication || (
               <>
                 {medication.dci}
@@ -76,7 +76,7 @@ export function MedListItem({
             }}
             aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
             aria-pressed={isFavorite}
-            className={`p-1.5 rounded-lg transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-amber-500 ${
+            className={`p-2.5 rounded-lg transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-amber-500 min-w-11 min-h-11 flex items-center justify-center ${
               isFavorite
                 ? "text-amber-400"
                 : "text-slate-700 hover:text-slate-500"

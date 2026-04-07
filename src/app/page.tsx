@@ -107,20 +107,20 @@ export default function HomePage() {
           {/* Consultés récemment */}
           {recentMeds.length > 0 && (
             <div>
-              <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-bold mb-2.5 px-0.5">
+              <p className="text-[10px] md:text-xs text-slate-600 uppercase tracking-[0.2em] font-bold mb-2.5 px-0.5">
                 Consultés récemment
               </p>
-              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
+              <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
                 {recentMeds.map((m) => (
                   <button
                     key={m.codeCIS}
                     onClick={() => router.push(`/med/${m.codeCIS}`)}
-                    className="flex-shrink-0 w-28 p-3 bg-slate-800/40 border-2 border-slate-700/25 rounded-xl hover:border-slate-600/50 transition-all active:scale-95 text-center"
+                    className="shrink-0 w-28 md:w-36 lg:w-40 p-3 md:p-4 bg-slate-800/40 border-2 border-slate-700/25 rounded-xl hover:border-slate-600/50 transition-all duration-150 active:scale-95 text-center min-h-12"
                   >
-                    <p className="text-xs font-bold text-slate-300 truncate">
+                    <p className="text-xs md:text-sm font-bold text-slate-300 truncate">
                       {m.name}
                     </p>
-                    <p className="text-[10px] text-slate-600 mt-0.5">
+                    <p className="text-[10px] md:text-xs text-slate-600 mt-0.5">
                       {m.dosage || m.dci}
                     </p>
                   </button>

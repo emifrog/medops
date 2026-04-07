@@ -52,10 +52,10 @@ export function MedDetail({
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-xl font-black text-white">{med.name}</h2>
+            <h2 className="text-xl md:text-2xl font-black text-white">{med.name}</h2>
             {med.dosage && <Badge color="#F59E0B">{med.dosage}</Badge>}
           </div>
-          <p className="text-slate-400 text-sm">
+          <p className="text-slate-400 text-sm md:text-base">
             {[med.dci, med.forme, med.labo].filter(Boolean).join(" · ")}
           </p>
         </div>

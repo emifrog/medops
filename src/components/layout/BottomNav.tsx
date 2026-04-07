@@ -65,10 +65,10 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-xl border-t-2 border-slate-800/60"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-xl border-t-2 border-slate-800/60 md:top-0 md:bottom-auto md:border-t-0 md:border-b-2 md:mt-13 lg:mt-15"
       aria-label="Navigation principale"
     >
-      <div className="max-w-lg mx-auto flex">
+      <div className="max-w-3xl lg:max-w-5xl mx-auto flex">
         {tabs.map((tab) => {
           const active = tab.matchPaths.some(
             (p) => pathname === p || (p !== "/" && pathname.startsWith(p)),
@@ -80,14 +80,14 @@ export function BottomNav() {
               key={tab.id}
               href={tab.href}
               aria-current={active ? "page" : undefined}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-amber-500 ${
+              className={`flex-1 flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 py-3 md:py-2.5 min-h-12 transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-amber-500 ${
                 active
                   ? "text-amber-500"
                   : "text-slate-600 hover:text-slate-400"
               }`}
             >
-              <IconComponent className="w-5 h-5" />
-              <span className="text-[9px] font-semibold uppercase tracking-wider">
+              <IconComponent className="w-5 h-5 md:w-4 md:h-4" />
+              <span className="text-[9px] md:text-xs font-semibold uppercase tracking-wider">
                 {tab.label}
               </span>
             </Link>

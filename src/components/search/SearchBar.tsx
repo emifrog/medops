@@ -27,7 +27,7 @@ export function SearchBar({
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
-        className="w-full pl-11 pr-10 py-3.5 bg-slate-800/70 border-2 border-slate-700/50 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-500/60 focus:bg-slate-800 transition-all duration-200 text-base"
+        className="w-full pl-11 pr-10 py-3.5 md:py-4 bg-slate-800/70 border-2 border-slate-700/50 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-500/60 focus:bg-slate-800 transition-all duration-200 text-base md:text-lg"
         autoFocus
       />
       {showClear && (

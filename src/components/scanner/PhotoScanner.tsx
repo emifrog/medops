@@ -49,7 +49,7 @@ export function PhotoScanner() {
         <button
           onClick={handleCapture}
           aria-label="Prendre une photo de la boîte de médicament"
-          className="w-full aspect-4/3 bg-slate-800/40 border-2 border-dashed border-slate-700/50 hover:border-amber-500/40 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all duration-150 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-amber-500"
+          className="w-full aspect-4/3 md:aspect-video bg-slate-800/40 border-2 border-dashed border-slate-700/50 hover:border-amber-500/40 rounded-2xl flex flex-col items-center justify-center gap-3 md:gap-4 transition-all duration-150 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-amber-500"
         >
           <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-500/30 flex items-center justify-center">
             <CameraIcon className="w-8 h-8 text-amber-400" />
@@ -69,7 +69,7 @@ export function PhotoScanner() {
           <img
             src={preview}
             alt="Photo de la boîte"
-            className="w-full aspect-4/3 object-cover"
+            className="w-full aspect-4/3 md:aspect-video object-cover"
           />
 
           {/* Overlay OCR */}

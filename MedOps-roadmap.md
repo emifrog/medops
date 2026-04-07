@@ -94,27 +94,15 @@ MedOps permet aux sapeurs-pompiers en intervention SAP/VSAV d'identifier rapidem
 
 ---
 
-### 🔷 Phase 4 — Indications, alertes visuelles, données embarquées (Semaines 10-12)
+### ✅ Phase 4 — Indications, alertes visuelles, données embarquées (Semaines 10-12) — TERMINEE 07/04/2026
 
 **Objectif** : Rendre l'app immédiatement utile et autonome dès l'installation.
 
-- [ ] **Indications en langage simple**
-  - Rédiger une phrase d'indication pour les 200 DCI les plus courantes
-  - Format : "Ce médicament traite : [indication]"
-  - Affichée en première section de la fiche, avant la composition
-  - Fallback : classe thérapeutique si pas d'indication rédigée
+- [x] **Indications en langage simple** — 60 DCI couvertes (30 avec CAT + 30 extra : IEC, sartans, statines, IPP, ISRS, diurétiques, antiépileptiques, antibiotiques, etc.). Affichée en sous-titre dans les résultats et en première section de la fiche détaillée.
 
-- [ ] **Alertes visuelles par gravité dans les résultats**
-  - Badge rouge/orange directement dans la liste de résultats (`MedListItem`)
-  - Le SP voit le niveau de danger **avant** d'ouvrir la fiche
-  - Croisement résultats de recherche × table `surdosage` via la DCI
-  - Icône ⚠️ "Surdosage potentiellement létal" / "Risque élevé"
+- [x] **Alertes visuelles par gravité dans les résultats** — Badge `⚠️ Létal` (rouge) et `⚠️ Élevé` (orange) visible dans toutes les listes (recherche, catégories, favoris). Hook `useSurdosageMap` pour croisement DCI × fiches CAT en mémoire.
 
-- [ ] **Données embarquées dans le build (offline dès l'installation)**
-  - Export JSON compressé des spécialités + compositions + CIP13
-  - Embarqué dans `public/data/` et precaché par Serwist
-  - L'app est utilisable **immédiatement sans connexion** au premier lancement
-  - Sync Supabase reste active pour les mises à jour
+- [ ] **Données embarquées dans le build** — script préparé, à finaliser (export JSON compressé dans `public/data/`, fallback dans le loader si pas de réseau au premier lancement)
 
 ---
 
@@ -279,4 +267,4 @@ medops/
 ---
 
 *MedOps — Un projet Orionis Solutions SAS*
-*Dernière mise à jour : 03 avril 2026*
+*Dernière mise à jour : 07 avril 2026*

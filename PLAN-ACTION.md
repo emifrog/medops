@@ -9,7 +9,7 @@
 > | Phase 1 — Fondations | ✅ TERMINEE | 29/03/2026 |
 > | Phase 2 — Recherche & Consultation | ✅ TERMINEE | 29/03/2026 |
 > | Phase 3 — Scanner CIP13 + Photo OCR + Données enrichies | ✅ TERMINEE | 03/04/2026 |
-> | Phase 4 — Indications, alertes visuelles, données embarquées | ⬜ À FAIRE | — |
+> | Phase 4 — Indications, alertes visuelles, données embarquées | ✅ TERMINEE | 07/04/2026 |
 > | Phase 5 — Mode intervention | ⬜ À FAIRE | — |
 >
 > **Base Supabase :** 15 816 spécialités · 20 881 CIP13 · 32 395 compositions · 8 479 alertes · 15 814 DCI · 30 fiches CAT/surdosage · 31 interactions

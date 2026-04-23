@@ -15,6 +15,10 @@ export function useCategoryMeds(category: Category | null) {
       return;
     }
 
+    // Pattern cancellation : si l'utilisateur change de catégorie avant la
+    // fin de la requête, on ignore les résultats pour éviter de stale-write
+    // le state avec des données obsolètes.
+    let cancelled = false;
     setLoading(true);
 
     async function load() {
@@ -24,24 +28,22 @@ export function useCategoryMeds(category: Category | null) {
           db.medications.where("codeATC").startsWith(prefix).toArray(),
         ),
       );
+      if (cancelled) return;
+
       const filtered = results.flat();
       filtered.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+      if (cancelled) return;
       setMeds(filtered);
       setLoading(false);
     }
 
     load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [category]);
 
   return { meds, loading };
-}
-
-export function useCategoryCounts() {
-  const [counts, setCounts] = useState<Map<string, number>>(new Map());
-
-  useEffect(() => {
-    // Placeholder — useCategoryCounts n'est plus utilisé (counts dans CategoryGrid)
-  }, []);
-
-  return counts;
 }

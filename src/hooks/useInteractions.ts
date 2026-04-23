@@ -2,60 +2,71 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { db } from "@/lib/db";
+import { splitDCI, matchSubstance, interactionKey } from "@/lib/utils/dci";
 import type { Medication } from "@/types/medication";
 import type { Interaction, DetectedInteraction } from "@/types/interaction";
 
 export function useInteractions(selectedMeds: Medication[]) {
   const [allInteractions, setAllInteractions] = useState<Interaction[]>([]);
 
-  // Charger toutes les interactions depuis IndexedDB
   useEffect(() => {
     db.interactions.toArray().then(setAllInteractions);
   }, []);
 
-  // Détecter les interactions entre les médicaments sélectionnés
   const detected = useMemo((): DetectedInteraction[] => {
     if (selectedMeds.length < 2 || allInteractions.length === 0) return [];
 
+    // Pré-calcul : pour chaque médicament sélectionné, extraire les substances
+    const medSubstances = selectedMeds.map((m) => ({
+      med: m,
+      parts: splitDCI(m.dci),
+    }));
+
     const results: DetectedInteraction[] = [];
+    const seen = new Set<string>();
 
-    for (let i = 0; i < selectedMeds.length; i++) {
-      for (let j = i + 1; j < selectedMeds.length; j++) {
-        const medA = selectedMeds[i]!;
-        const medB = selectedMeds[j]!;
-        const dciA = medA.dci.toUpperCase();
-        const dciB = medB.dci.toUpperCase();
+    for (let i = 0; i < medSubstances.length; i++) {
+      for (let j = i + 1; j < medSubstances.length; j++) {
+        const a = medSubstances[i]!;
+        const b = medSubstances[j]!;
 
-        // Chercher les interactions dans les deux sens
         for (const inter of allInteractions) {
-          const s1 = inter.substance1.toUpperCase();
-          const s2 = inter.substance2.toUpperCase();
+          // Matching bidirectionnel : inter.substance1 dans med A + inter.substance2 dans med B, ou inversement
+          const s1InA = matchSubstance(inter.substance1, a.parts);
+          const s2InB = matchSubstance(inter.substance2, b.parts);
+          const s1InB = matchSubstance(inter.substance1, b.parts);
+          const s2InA = matchSubstance(inter.substance2, a.parts);
 
-          const match =
-            (dciA.includes(s1) && dciB.includes(s2)) ||
-            (dciA.includes(s2) && dciB.includes(s1));
+          const matchesAtoB = s1InA && s2InB;
+          const matchesBtoA = s1InB && s2InA;
 
-          if (match) {
-            results.push({
-              ...inter,
-              medA: { name: medA.name, codeCIS: medA.codeCIS },
-              medB: { name: medB.name, codeCIS: medB.codeCIS },
-            });
-          }
+          if (!matchesAtoB && !matchesBtoA) continue;
+
+          // Déduplication : (A+B, level) ne doit apparaître qu'une fois
+          const key = interactionKey(
+            `${a.med.codeCIS}_${inter.substance1}`,
+            `${b.med.codeCIS}_${inter.substance2}`,
+            inter.level,
+          );
+          if (seen.has(key)) continue;
+          seen.add(key);
+
+          results.push({
+            ...inter,
+            medA: { name: a.med.name, codeCIS: a.med.codeCIS },
+            medB: { name: b.med.name, codeCIS: b.med.codeCIS },
+          });
         }
       }
     }
 
-    // Trier par gravité
     const order = {
       "contre-indiquee": 0,
       deconseillee: 1,
       precaution: 2,
       "a-prendre-en-compte": 3,
     };
-    results.sort(
-      (a, b) => (order[a.level] ?? 4) - (order[b.level] ?? 4),
-    );
+    results.sort((a, b) => (order[a.level] ?? 4) - (order[b.level] ?? 4));
 
     return results;
   }, [selectedMeds, allInteractions]);

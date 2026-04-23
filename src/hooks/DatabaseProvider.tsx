@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { loadDatabase, type LoadingState } from "@/lib/db/loader";
-import { buildIndex } from "@/lib/search/engine";
+import { buildIndex, invalidateIndexCache } from "@/lib/search/engine";
 import { purgeHistory } from "@/lib/db/history";
 
 interface DatabaseContextValue {
@@ -52,6 +52,8 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const reload = useCallback(async () => {
     setState({ status: "idle" });
     setSearchReady(false);
+    // Force un rebuild de l'index même si la version ne change pas
+    await invalidateIndexCache();
     await init();
   }, [init]);
 

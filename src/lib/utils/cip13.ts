@@ -1,22 +1,26 @@
 /**
- * Valide un code CIP13 (13 chiffres + checksum Luhn)
+ * Valide un code CIP13 (13 chiffres + checksum EAN-13).
+ *
+ * IMPORTANT : le CIP13 utilise le checksum EAN-13 (poids alternés 1-3),
+ * PAS l'algorithme de Luhn. Ne pas confondre.
  */
 export function isValidCIP13(code: string): boolean {
   if (!/^\d{13}$/.test(code)) return false;
-  return luhnCheck(code);
+  return ean13Check(code);
 }
 
-function luhnCheck(code: string): boolean {
+/**
+ * Checksum EAN-13 : somme pondérée (1-3-1-3...) des 12 premiers chiffres.
+ * Le 13e chiffre est le complément à 10 modulo 10.
+ */
+function ean13Check(code: string): boolean {
   let sum = 0;
-  for (let i = 0; i < code.length; i++) {
-    let digit = parseInt(code[code.length - 1 - i]!, 10);
-    if (i % 2 === 1) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-    sum += digit;
+  for (let i = 0; i < 12; i++) {
+    const digit = parseInt(code[i]!, 10);
+    sum += digit * (i % 2 === 0 ? 1 : 3);
   }
-  return sum % 10 === 0;
+  const expected = (10 - (sum % 10)) % 10;
+  return expected === parseInt(code[12]!, 10);
 }
 
 /**

@@ -1,6 +1,6 @@
 "use client";
 
-import { useDatabase } from "@/hooks/useDatabase";
+import { useDatabase } from "@/hooks/DatabaseProvider";
 
 export default function SettingsPage() {
   const { state } = useDatabase();

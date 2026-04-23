@@ -32,33 +32,28 @@ export function splitDCI(raw: string): string[] {
 }
 
 /**
- * Vérifie si une substance (ex: "APIXABAN") correspond à une des substances
- * extraites d'un DCI d'un médicament.
+ * Vérifie si une substance correspond à une des substances extraites d'un DCI.
  *
- * Matching par égalité stricte (après normalisation) OU par mot entier
- * (la substance forme un mot complet dans le DCI, pas une sous-chaîne).
+ * Matching strict : égalité après normalisation.
+ *
+ * Pour les substances composées de plusieurs mots ("ACIDE ACETYLSALICYLIQUE"),
+ * l'égalité après normalisation est également requise — pas de sous-chaîne.
+ *
+ * Les `parts` sont supposés déjà normalisés (sortie de splitDCI).
+ * Si l'appelant passe des parts bruts, normalizeDCI est appliqué ici aussi
+ * pour garantir la symétrie des comparaisons.
  *
  * Exemples :
  * - matchSubstance("APIXABAN", ["APIXABAN"]) → true
  * - matchSubstance("APIXABAN", ["AMOXICILLINE", "ACIDE CLAVULANIQUE"]) → false
- * - matchSubstance("ACIDE ACÉTYLSALICYLIQUE", ["ACIDE ACETYLSALICYLIQUE"]) → true (accents)
- * - matchSubstance("CODEINE", ["PARACETAMOL", "CODEINE"]) → true
- * - matchSubstance("ACIDE", ["ACIDE CLAVULANIQUE"]) → false (ACIDE seul n'est pas une substance à part entière ici)
+ * - matchSubstance("PARACÉTAMOL", ["PARACETAMOL"]) → true (accents)
+ * - matchSubstance("ACIDE", ["ACIDE CLAVULANIQUE"]) → false (pas une substance complète)
  */
 export function matchSubstance(target: string, dciParts: string[]): boolean {
   const normalizedTarget = normalizeDCI(target);
   if (normalizedTarget.length < 3) return false;
 
-  return dciParts.some((part) => {
-    // Égalité stricte après normalisation
-    if (part === normalizedTarget) return true;
-
-    // Match par mot entier (évite les sous-chaînes)
-    const boundary = new RegExp(
-      `(^|[\\s\\-,+/])${escapeRegExp(normalizedTarget)}($|[\\s\\-,+/])`,
-    );
-    return boundary.test(part);
-  });
+  return dciParts.some((part) => normalizeDCI(part) === normalizedTarget);
 }
 
 function escapeRegExp(str: string): string {

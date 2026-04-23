@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { db } from "@/lib/db";
+import { addHistoryEntry } from "@/lib/db/history";
 import type { MedicationFull } from "@/types/medication";
 
 export function useMedication(codeCIS: string | null) {
@@ -34,12 +35,8 @@ export function useMedication(codeCIS: string | null) {
         setMedication({ ...med, substances, alerts, surdosage });
         setLoading(false);
 
-        // Enregistrer dans l'historique
-        await db.history.add({
-          codeCIS: med.codeCIS,
-          medName: med.name,
-          date: new Date().toISOString(),
-        });
+        // Enregistrer dans l'historique (avec déduplication rapprochée)
+        await addHistoryEntry(med.codeCIS, med.name);
       }
     }
 

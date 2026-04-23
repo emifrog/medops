@@ -3,10 +3,10 @@
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { LoadingScreen } from "@/components/layout/LoadingScreen";
-import { useDatabase } from "@/hooks/useDatabase";
+import { DatabaseProvider, useDatabase } from "@/hooks/DatabaseProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const { state, reload } = useDatabase();
 
   if (state.status !== "ready") {
@@ -23,5 +23,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <BottomNav />
       </div>
     </ToastProvider>
+  );
+}
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <DatabaseProvider>
+      <AppShellInner>{children}</AppShellInner>
+    </DatabaseProvider>
   );
 }

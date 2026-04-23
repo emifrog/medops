@@ -1,6 +1,7 @@
 "use client";
 
 import { useOfflineStatus } from "@/hooks/useOfflineStatus";
+import { Logo } from "@/components/ui/Logo";
 
 interface HeaderProps {
   dbVersion?: string;
@@ -14,9 +15,7 @@ export function Header({ dbVersion, dbCount }: HeaderProps) {
     <header className="sticky top-0 z-40 bg-slate-950/85 backdrop-blur-xl border-b-2 border-slate-800/60">
       <div className="max-w-3xl lg:max-w-5xl mx-auto px-4 md:px-6 lg:px-8 py-3 md:py-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-linear-to-br from-amber-500 to-red-600 flex items-center justify-center shadow-lg shadow-amber-900/30">
-            <span className="text-sm md:text-base font-black text-white">M</span>
-          </div>
+          <Logo className="w-8 h-8 md:w-10 md:h-10 rounded-lg shadow-lg shadow-amber-900/30" />
           <div>
             <h1 className="text-sm md:text-base font-black tracking-tight leading-none">
               MED<span className="text-amber-500">OPS</span>

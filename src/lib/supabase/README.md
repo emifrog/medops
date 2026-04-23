@@ -2,40 +2,39 @@
 
 ## Fichiers
 
-- `types.ts` — types **rédigés à la main** (source de vérité actuelle)
-- `types.generated.ts` — types **auto-générés** depuis le schéma Supabase (à générer)
+- `types.generated.ts` — types **auto-générés** depuis le schéma Supabase (source de vérité)
 - `client.ts` / `server.ts` — clients Supabase typés via `Database`
 
-## Régénérer les types depuis Supabase
+## Régénérer les types
+
+Après toute modification du schéma (migration SQL, nouvelle table, etc.) :
 
 ```bash
 npm run supabase:types
 ```
 
-Ce script utilise le CLI Supabase (installé en devDependency) et interroge le
-projet `nllepowaozpsahxjvbhj` pour produire `types.generated.ts`.
+Ce script utilise le CLI Supabase (installé en devDependency) et interroge
+le projet distant pour produire `types.generated.ts`.
 
-**Prérequis :** être connecté au CLI (`npx supabase login` une fois).
+**Prérequis (une fois) :**
 
-## Bascule vers les types générés
+```bash
+npx supabase login
+```
 
-Quand `types.generated.ts` est à jour et que vous souhaitez l'utiliser comme
-source de vérité :
+## Utilisation
 
-1. Remplacer dans `client.ts` et `server.ts` :
-   ```ts
-   import type { Database } from "./types";
-   ```
-   par
-   ```ts
-   import type { Database } from "./types.generated";
-   ```
-2. Vérifier `npm run build` passe
-3. Supprimer `types.ts`
+Importer `Database` ou le type union des tables :
 
-## Pourquoi garder les deux pour l'instant ?
+```ts
+import type { Database } from "@/lib/supabase/types.generated";
 
-Le fichier manuel est stable et couvre les tables actuelles. Basculer
-nécessite l'accès au CLI Supabase authentifié (hors CI). Plutôt que de
-forcer la bascule maintenant, on garde la possibilité et on migre quand
-on voudra aussi ajouter la génération à la CI.
+type SupabaseTable = keyof Database["public"]["Tables"];
+type MedicationRow = Database["public"]["Tables"]["medications"]["Row"];
+```
+
+## Note
+
+Le fichier `types.generated.ts` est committé dans le repo (pas de CI qui
+le régénère à chaque build). Penser à lancer `npm run supabase:types`
+et committer le résultat quand le schéma change.

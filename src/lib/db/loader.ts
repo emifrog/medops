@@ -1,9 +1,12 @@
 import { db } from "./index";
 import type { Table } from "dexie";
 import { getSupabase } from "@/lib/supabase/client";
+import type { Database } from "@/lib/supabase/types.generated";
 import type { Medication, Substance, Presentation, Alert } from "@/types/medication";
 import type { Interaction } from "@/types/interaction";
 import type { Surdosage } from "@/types/surdosage";
+
+type SupabaseTable = keyof Database["public"]["Tables"];
 
 const BATCH_SIZE = 1000;
 
@@ -34,7 +37,7 @@ async function getRemoteVersion(): Promise<string | null> {
 }
 
 async function fetchAndStore<T>(
-  tableName: string,
+  tableName: SupabaseTable,
   store: Table<T>,
   mapRow: (row: Record<string, unknown>) => T,
   onProgress: (loaded: number, total: number) => void,

@@ -43,6 +43,9 @@ public/swe-worker*
 # ANSM data files (downloaded by import script)
 scripts/.ansm-data/
 
+# Supabase CLI temp files
+supabase/.temp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

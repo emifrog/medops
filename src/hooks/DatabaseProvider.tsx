@@ -8,7 +8,11 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { loadDatabase, type LoadingState } from "@/lib/db/loader";
+import {
+  loadDatabase,
+  resetSyncTimestamps,
+  type LoadingState,
+} from "@/lib/db/loader";
 import { buildIndex, invalidateIndexCache } from "@/lib/search/engine";
 import { purgeHistory } from "@/lib/db/history";
 
@@ -52,7 +56,8 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const reload = useCallback(async () => {
     setState({ status: "idle" });
     setSearchReady(false);
-    // Force un rebuild de l'index même si la version ne change pas
+    // Force un full sync : efface les timestamps et invalide le cache d'index
+    await resetSyncTimestamps();
     await invalidateIndexCache();
     await init();
   }, [init]);
